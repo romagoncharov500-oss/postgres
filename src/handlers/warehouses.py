@@ -43,6 +43,41 @@ class Warehouse:
     label: str | None
     is_central: bool 
 
+def _is_contain_central() -> bool:
+    conn = get_conn()
+    cur = conn.cursor(row_factory=class_row(Warehouse))
+    cur.execute("SELECT * FROM catalog.warehouses WHERE is_central")
+    warehouses: list[Warehouse] = cur.fetchall()
+    return len(warehouses) != 0
+
+def _get_central_id() -> str:
+    conn = get_conn()
+    cur = conn.cursor(row_factory=class_row(Warehouse))
+    cur.execute("SELECT * FROM catalog.warehouses WHERE is_central")
+    warehouses: list[Warehouse] = cur.fetchall()
+    if len(warehouses) != 0:
+        console.print("[bold red]Найден центральный склад (центральный склад может быть только один): [/bold red]")
+        table = Table(title="Склады", show_header=False, header_style="bold cyan")
+        for warehouse in warehouses:
+            table.add_row(
+                    str(warehouse.id),
+                    warehouse.city,
+                    warehouse.address,
+                    warehouse.label or "",
+                    str(warehouse.is_central)
+                )
+        console.print(table)
+        return warehouse.id
+    else:
+        return ""    
+
+def _get_central_warehoue() -> Warehouse:
+    conn = get_conn()
+    cur = conn.cursor(row_factory=class_row(Warehouse))
+    cur.execute("SELECT * FROM catalog.warehouses WHERE is_central")
+    warehouse: Warehouse = cur.fetchall()
+    return warehouse
+ 
 
 def _render_warehouse(warehouse: Warehouse) -> None:
     table = Table(show_header=False, box=None, padding=(0, 2))
@@ -54,6 +89,7 @@ def _render_warehouse(warehouse: Warehouse) -> None:
     table.add_row("Город", warehouse.city)
     table.add_row("Адрес", warehouse.address)
     table.add_row("Метка", warehouse.label or "")
+    table.add_row("Центральный", str(warehouse.is_central))
 
     panel = Panel(
         table,
@@ -86,6 +122,7 @@ def list_warehouses() -> None:
             warehouse.city,
             warehouse.address,
             warehouse.label or "",
+            str(warehouse.is_central)
         )
     console.print(table)
 
@@ -110,10 +147,28 @@ def add_warehouse() -> None:
     city = prompt("Город: ", validator=city_validator, completer=city_completer).strip()
     address = prompt("Адрес: ", validator=NonEmptyValidator()).strip()
     label = prompt("Метка (необязательно): ").strip() or None
+    is_central = prompt("Центральный: ", default="TRUE", validator=YesNoValidator()).strip()
+
+    if(str(is_central)=="y"):
+        if _is_contain_central():
+            id_central = _get_central_id()
+            change_central = prompt(f"Центральный склад ID: {id_central} уже задан хотите заменить его на новый?", 
+                                    validator=YesNoValidator()).strip()
+            if change_central:
+                    conn.execute("UPDATE catalog.warehouses SET is_central = %s WHERE id = %s",
+                                 ("FALSE", id_central)
+                                 
+                    )   
+            else:
+                console.print("")
+                conn.cancel()
+                conn.close()
+
     conn.execute(
-        "INSERT INTO catalog.warehouses (city, address, label) VALUES (%s, %s, %s)",
-        (city, address, label),
+            "INSERT INTO catalog.warehouses (city, address, label, is_central) VALUES (%s, %s, %s, %s)",
+            (city, address, label, is_central),
     )
+
     if label:
         console.print(f"[green]Склад в городе {city} ({label}) добавлен [/green]")
     else:
@@ -143,10 +198,13 @@ def edit_warehouse(_id: str) -> None:
     label = (
         prompt("Метка (необязательно): ", default=warehouse.label or "").strip() or None
     )
+    is_central = (
+        prompt("Центральный склад: ", default="FALSE")
+    )
     conn.execute(
         """UPDATE catalog.warehouses SET city = %s, address = %s, label = %s
         WHERE id = %s""",
-        (city, address, label, _id),
+        (city, address, label, is_central, _id),
     )
     if label:
         console.print(f"[green]Склад в городе {city} ({label}) обновлен [/green]")
