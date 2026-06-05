@@ -3,7 +3,7 @@ CREATE TABLE catalog.products(
     sku VARCHAR(30) NOT NULL,
     name TEXT NOT NULL,
     price numeric(5,2) NOT NULL,
-    category_id SERIAL,
+    category_id INT,
     UNIQUE(sku)
 );
 
@@ -12,10 +12,8 @@ CREATE TABLE catalog.warehouses(
     city TEXT NOT NULL,
     address TEXT NOT NULL,
     label TEXT,
-    is_central BOOL
-);
+    is_central BOOL);
 
 CREATE TABLE catalog.product_categories(
-    id serial PRIMARY_KEY,
-    name TEXT
-);
+    id serial PRIMARY KEY, 
+    name TEXT NOT NULL);
