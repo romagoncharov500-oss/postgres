@@ -1,1 +1,6 @@
-/.idea
+.idea
+.venv
+postgresql_data
+__pycache__
+.mypy_cache
+logs/
