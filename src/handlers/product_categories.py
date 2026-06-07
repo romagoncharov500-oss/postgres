@@ -37,7 +37,7 @@ def _render_category(category) -> None:
     table.add_column("Значение", style="white")
 
     table.add_row("ID", str(category.id))
-    table.add_row("Город", category.name)
+    table.add_row("Категория", category.name)
 
     panel = Panel(
         table,
@@ -80,7 +80,7 @@ def show_product_category(_id: str) -> None:
 
     _render_category(category)
 
-@command("add category", "добавить категория (интерактивно)", CATEGORY_PRODUCT_CATEGORIES)
+@command("add category", "добавить категорию (интерактивно)", CATEGORY_PRODUCT_CATEGORIES)
 def add_product_category() -> None:
     conn = get_conn()
     name = prompt("Категория: ", validator=name_validator, completer=name_completer).strip()
@@ -99,7 +99,7 @@ def edit_product_category(_id: str) -> None:
         category: Category | None = cur.fetchone()
 
     if category is None:
-        render_error(f"Склад с ID {_id} не найден")
+        render_error(f"Категория с ID {_id} не найден")
         return
 
     name = prompt(
@@ -110,7 +110,7 @@ def edit_product_category(_id: str) -> None:
     ).strip()
     
     conn.execute(
-        """UPDATE catalog.categorys SET name = %s
+        """UPDATE catalog.product_categories SET name = %s
         WHERE id = %s""",
         (name, _id),
     )
