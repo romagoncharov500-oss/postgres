@@ -19,7 +19,7 @@ class Product:
     sku: str
     name: str
     price: Decimal
-    category: str
+    category_id: int
 
 
 def _render_product(product: Product):  # pylint: disable=unused-argument
@@ -33,10 +33,10 @@ def _render_product(product: Product):  # pylint: disable=unused-argument
     table.add_column("Значение", style="white")
 
     table.add_row("ID", str(product.id))
-    table.add_row("SKU", product.sku)
+    table.add_row("SKU", str(product.sku))
     table.add_row("Название", product.name)
-    table.add_row("Цена", product.price or "")
-    table.add_row("Категория", product.category)
+    table.add_row("Цена", str(product.price))
+    table.add_row("Категория", str(product.category_id))
 
     panel = Panel(
         table,
@@ -74,7 +74,7 @@ def list_products() -> None:
             product.sku,
             product.name,
             str(product.price),
-            str(product.category)
+            str(product.category_id),
         )
     console.print(table)
 
@@ -88,7 +88,7 @@ def show_product(_id: str) -> None:
     """
     conn = get_conn()
     with conn.cursor(row_factory=class_row(Product)) as cur:
-        cur.execute("SELECT * FROM catalog.Products WHERE id = %s", (_id,))
+        cur.execute("SELECT * FROM catalog.products WHERE id = %s", (_id,))
         product: Product | None = cur.fetchone()
 
     if product is None:
@@ -140,7 +140,7 @@ def edit_product(_id: str) -> None:
         prompt("Цена: ", default=product.price, validator=PriceValidator).strip()
     )
     category = (
-        prompt("Категория: ", default=product.category, validator=NonEmptyValidator()).strip()
+        prompt("Категория: ", default=product.category_id, validator=NonEmptyValidator()).strip()
     )
     conn.execute(
         """UPDATE catalog.products SET sku = %s, name = %s, price = %s, category = %s
