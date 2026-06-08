@@ -1,0 +1,74 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="tIBxIsXK1-ZMpnfWx1T-">
+    <mxGraphModel dx="1344" dy="848" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-22" parent="1" style="swimlane;" value="products" vertex="1">
+          <mxGeometry height="120" width="120" x="280" y="60" as="geometry">
+            <mxRectangle height="30" width="90" x="410" y="170" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-25" parent="AWGxeyqGrs2tDWng4oW6-22" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="&lt;b&gt;id: SERIAL&lt;/b&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;&quot;&gt;sku: VARCHAR(30)&lt;/span&gt;&lt;b&gt;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;&quot;&gt;name: TEXT&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;&quot;&gt;price: DECIMAL&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;&quot;&gt;category_id: INT&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;&quot;&gt;&lt;span style=&quot;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="110" x="5" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-30" parent="1" style="swimlane;" value="warehouses" vertex="1">
+          <mxGeometry height="130" width="130" x="510" y="440" as="geometry">
+            <mxRectangle height="30" width="110" x="220" y="340" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-31" parent="AWGxeyqGrs2tDWng4oW6-30" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="&lt;b&gt;id: SERIAL&lt;/b&gt;&lt;div&gt;city: TEXT&lt;/div&gt;&lt;div&gt;address: TEXT&lt;/div&gt;&lt;div&gt;label: TEXT&lt;/div&gt;&lt;div&gt;is_central: BOOL&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="120" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-47" parent="1" style="swimlane;" value="product_categories" vertex="1">
+          <mxGeometry height="130" width="120" x="590" y="40" as="geometry">
+            <mxRectangle height="30" width="140" x="510" y="80" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-48" parent="AWGxeyqGrs2tDWng4oW6-47" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="&lt;b&gt;id: SERIAL&lt;/b&gt;&lt;div&gt;name: TEXT&lt;/div&gt;" vertex="1">
+          <mxGeometry height="30" width="150" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-49" parent="1" style="swimlane;" value="orders" vertex="1">
+          <mxGeometry height="200" width="290" x="110" y="340" as="geometry">
+            <mxRectangle height="30" width="80" x="90" y="220" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-50" parent="AWGxeyqGrs2tDWng4oW6-49" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="&lt;b&gt;id: SERIAL&lt;/b&gt;&lt;div&gt;status: TEXT CHECK&amp;nbsp;&lt;/div&gt;&lt;div&gt;(status IN (&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&#39;unpublished&#39;, &#39;new&#39;, &#39;processing&#39;, &#39;pending&#39;, &#39;packing&#39;, &#39;shipped&#39;)&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;total_ammount: DECIMAL&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;created_at: timestamptz&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;warehouse_id: INT&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="159" width="280" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-54" parent="1" style="swimlane;" value="order_items" vertex="1">
+          <mxGeometry height="200" width="200" x="500" y="190" as="geometry">
+            <mxRectangle height="30" width="100" x="550" y="250" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-107" parent="AWGxeyqGrs2tDWng4oW6-54" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;id: SERIAL&lt;/b&gt;&lt;div style=&quot;text-align: left;&quot;&gt;product_id: INT&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;quantity: INT&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="120" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-79" edge="1" parent="1" source="AWGxeyqGrs2tDWng4oW6-22" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERzeroToMany;startArrow=ERmandOne;rounded=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endFill=0;" target="AWGxeyqGrs2tDWng4oW6-54" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <mxPoint x="220" y="140" as="sourcePoint" />
+            <mxPoint x="490" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-133" edge="1" parent="1" source="AWGxeyqGrs2tDWng4oW6-22" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERmandOne;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;startArrow=ERzeroToMany;startFill=0;" target="AWGxeyqGrs2tDWng4oW6-47" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <mxPoint x="450" y="100" as="sourcePoint" />
+            <mxPoint x="640" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-136" edge="1" parent="1" source="AWGxeyqGrs2tDWng4oW6-49" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERoneToMany;startArrow=ERmandOne;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;startFill=0;" target="AWGxeyqGrs2tDWng4oW6-107" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <mxPoint x="540" y="520" as="sourcePoint" />
+            <mxPoint x="530" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="AWGxeyqGrs2tDWng4oW6-137" edge="1" parent="1" source="AWGxeyqGrs2tDWng4oW6-49" style="edgeStyle=entityRelationEdgeStyle;fontSize=12;html=1;endArrow=ERmandOne;startArrow=ERzeroToMany;rounded=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;startFill=0;endFill=0;" target="AWGxeyqGrs2tDWng4oW6-31" value="">
+          <mxGeometry height="100" relative="1" width="100" as="geometry">
+            <mxPoint x="540" y="520" as="sourcePoint" />
+            <mxPoint x="500" y="490" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
