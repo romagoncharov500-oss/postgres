@@ -46,7 +46,13 @@ def _get_order(_id: int) -> Order | None:
         render_error(f"Заказ с ID {_id} не найден.")
     
     return order
-    
+
+def _has_unpublished_status(_order : Order) -> bool:
+    if _order.status != "unpublished":
+        render_error(f"Заказ ID: {_order.id} уже опубликован (статус: '{_order.status}'). Изменения запрещены.")
+        return False
+    else:
+        return True
 
 def _render_order(order: Order) -> None:
     table = Table(show_header=False, box=None, padding=(0, 2))
@@ -140,6 +146,9 @@ def edit_order(_id: str) -> None:
     if order is None:
         return
 
+    if not _has_unpublished_status(order):
+        return
+    
     console.print(f"Редактирование заказа ID: {order.id} (текущий статус: {order.status}, склад: {order.warehouse_id})")
     
     new_status = prompt(
@@ -159,6 +168,30 @@ def edit_order(_id: str) -> None:
     console.print(f"[green] Заказ ID: {order.id} успешно обновлен.[/green]")
 
 
+@command("publish order", "опубликовать заказ (сменить статус на new)", CATEGORY_ORDERS)
+def publish_order(_id: str) -> None:
+
+    order_id = int(_id)
+
+    order = _get_order(order_id)
+    if order is None:
+        return
+
+    # Проверяем, можно ли публиковать этот заказ
+    if order.status != "unpublished":
+        render_error(f"Заказ ID: {order_id} уже имеет статус '{order.status}'. Публикация возможна только для статуса 'unpublished'.")
+        return
+
+    # Меняем статус на 'new'
+    conn = get_conn()
+    conn.execute(
+        "UPDATE sales.orders SET status = %s WHERE id = %s",
+        ("new", order_id)
+    )
+    
+    console.print(f"[green] Заказ ID: {order_id} успешно опубликован (статус изменен на 'new').[/green]")
+
+
 @command("delete order", "удалить заказ", CATEGORY_ORDERS)
 def delete_order(_id: str) -> None:
     conn = get_conn()
@@ -166,6 +199,9 @@ def delete_order(_id: str) -> None:
     order = _get_order(order_id)
 
     if order is None:
+        return
+    
+    if not _has_unpublished_status(order):
         return
 
     confirm = prompt(f"Вы уверены, что хотите удалить заказ ID: {_id} и все товары в нем? (y/n): ", validator=YesNoValidator())
