@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from decimal import Decimal
 
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
@@ -11,6 +12,7 @@ from console import console, render_error
 from db import get_conn
 from validators import ChoiceValidator, PositiveIntValidator, YesNoValidator
 from commands import command, CATEGORY_ORDERS
+from handlers.order_items import add_item
 
 
 valid_statuses = [
@@ -27,11 +29,12 @@ status_validator = ChoiceValidator(
     valid_statuses, message="Статуст должен быть из списка."
 )
 
+
 @dataclass
 class Order:
     id: int
     status: str
-    total_amount: float
+    total_amount: Decimal
     created_at: datetime
     warehouse_id: int
 
@@ -44,8 +47,9 @@ def _get_order(_id: int) -> Order | None:
 
     if order is None:
         render_error(f"Заказ с ID {_id} не найден.")
-    
+
     return order
+
 
 def _has_unpublished_status(_order : Order) -> bool:
     if _order.status != "unpublished":
@@ -53,6 +57,7 @@ def _has_unpublished_status(_order : Order) -> bool:
         return False
     else:
         return True
+
 
 def _render_order(order: Order) -> None:
     table = Table(show_header=False, box=None, padding=(0, 2))
@@ -131,9 +136,6 @@ def add_order() -> None:
     # Интерактивное предложение добавить товары сразу
     add_items_now = prompt("Добавить товары в этот заказ прямо сейчас?", validator=YesNoValidator())
     if YesNoValidator.is_yes(add_items_now):
-        
-        from handlers.order_items import add_item
-        
         add_item(str(new_order_id))
 
 
@@ -150,21 +152,14 @@ def edit_order(_id: str) -> None:
         return
     
     console.print(f"Редактирование заказа ID: {order.id} (текущий статус: {order.status}, склад: {order.warehouse_id})")
-    
-    new_status = prompt(
-        "Новый статус (отображен текущий): ",
-        completer=status_completer,
-        validator=status_validator,
-        default=order.status
-    ).strip()
-    
+
     new_warehouse_str = prompt(
         "Новый ID склада (отображен текущий): ",
         validator=PositiveIntValidator(),
         default=str(order.warehouse_id)
     ).strip()
     
-    conn.execute("UPDATE sales.orders SET status = %s, warehouse_id = %s WHERE id = %s", (new_status, new_warehouse_str, order_id))
+    conn.execute("UPDATE sales.orders SET warehouse_id = %s WHERE id = %s", (new_warehouse_str, order_id))
     console.print(f"[green] Заказ ID: {order.id} успешно обновлен.[/green]")
 
 
