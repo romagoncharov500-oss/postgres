@@ -11,7 +11,6 @@ CREATE TABLE sales.orders (
 );
 
 CREATE TABLE sales.order_items (
-    id serial PRIMARY KEY,
     order_id integer NOT NULL,
     product_id integer NOT NULL,
     quantity integer NOT NULL,
@@ -19,5 +18,6 @@ CREATE TABLE sales.order_items (
     -- Ссылка на заказ в схеме sales
     CONSTRAINT order_ref FOREIGN KEY (order_id) REFERENCES sales.orders (id) ON DELETE CASCADE,
     -- Ссылка на товар в схеме catalog
-    CONSTRAINT product_ref FOREIGN KEY (product_id) REFERENCES catalog.products (id)
+    CONSTRAINT product_ref FOREIGN KEY (product_id) REFERENCES catalog.products (id),
+    PRIMARY KEY (order_id, product_id)
 );
