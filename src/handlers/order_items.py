@@ -15,7 +15,6 @@ from handlers.products import Product
 
 @dataclass
 class Item:
-    id: int
     order_id: int
     product_id: int
     quantity: int
@@ -91,7 +90,7 @@ def add_item(_id: str) -> None:
         products = _get_availible_products(order_id)
 
         if not products:
-            render_error("Каталог товаров пуст. Невозможно добавить позицию.")
+            render_error("Каталог товаров пуст или все возможные товары уже были добавлены в заказ. Невозможно добавить позицию.")
             return
 
         completion_mapping = {}
@@ -146,8 +145,8 @@ def edit_item(_id: str) -> None:
 
     conn = get_conn()
     conn.execute(
-        "UPDATE sales.order_items SET quantity = %s WHERE id = %s",
-        (new_quantity, item_to_edit.id)
+        "UPDATE sales.order_items SET quantity = %s WHERE order_id = %s, product_id = %s",
+        (new_quantity, item_to_edit.order_id, item_to_edit.product_id,)
     )
     _update_order_total(order_id)
     console.print(f"[green] Количество успешно обновлено на {new_quantity} для позиции в заказе ID: {order_id}.[/green]")
@@ -157,15 +156,15 @@ def edit_item(_id: str) -> None:
 def delete_item(_id: str) -> None:
     order_id = int(_id)
  
-    item_id_to_delete = _choose_order_item(order_id)
-    if item_id_to_delete is None:
+    item_to_delete = _choose_order_item(order_id)
+    if item_to_delete is None:
         render_error("Не был выбран товар для удаления из заказа")
         return
     
     conn = get_conn()
     conn.execute(
-        "DELETE FROM sales.order_items WHERE id = %s",
-        (item_id_to_delete,)
+        "DELETE FROM sales.order_items WHERE order_id = %s AND product_id = %s",
+        (item_to_delete.order_id, item_to_delete.product_id,)
     )
     _update_order_total(order_id)
     console.print(f"[green] Товар успешно удален из заказа ID: {order_id}.[/green]")
