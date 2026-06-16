@@ -145,7 +145,7 @@ def edit_item(_id: str) -> None:
 
     conn = get_conn()
     conn.execute(
-        "UPDATE sales.order_items SET quantity = %s WHERE order_id = %s, product_id = %s",
+        "UPDATE sales.order_items SET quantity = %s WHERE order_id = %s AND product_id = %s",
         (new_quantity, item_to_edit.order_id, item_to_edit.product_id,)
     )
     _update_order_total(order_id)
