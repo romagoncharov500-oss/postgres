@@ -17,3 +17,33 @@ CREATE TABLE catalog.warehouses(
 CREATE TABLE catalog.product_categories(
     id serial PRIMARY KEY, 
     name TEXT NOT NULL);
+
+// in psql
+CREATE ROLE catalog_manager WITH LOGIN PASSWORD 'cmpss';
+CREATE ROLE sales_manager WITH LOGIN PASSWORD 'smpss';
+CREATE ROLE supervisor WITH LOGIN PASSWORD 'super';
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+// in alembic up.sql
+    // catalog_manager
+    GRANT ALL ON TABLE IN SCHEMA catalog TO catalog_manager;
+    ALTER DEFAULT PRIVILEGES FOR ROLE PUBLIC IN SCHEMA catalog
+        GRANT SELECT ON TABLES TO PUBLIC;
+
+    // sales_manager
+    GRANT ALL ON TABLE IN SCHEMA sales TO sales_manager;
+
+    // participating
+    GRANT catalog_manager TO supervisor WITH ADMIN TRUE;
+    GRANT sales_manager TO supervisor WITH ADMIN TRUE;
+
+    // authentication
+    CREATE SCHEMA auth
+    ALTER DEFAULT PRIVILEGES FOR ROLE PUBLIC IN SCHEMA auth
+        GRANT SELECT ON SCHEMA auth TO PUBLIC;
+
+
+
+
+
+
