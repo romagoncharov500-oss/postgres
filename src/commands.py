@@ -9,14 +9,17 @@ CATEGORY_GENERAL: Final[str] = "ПРОЧЕЕ"
 CATEGORY_WAREHOUSES: Final[str] = "СКЛАДЫ"
 CATEGORY_PRODUCTS: Final[str] = "ТОВАРЫ"
 CATEGORY_PRODUCT_CATEGORIES: Final[str] = "КАТЕГОРИИ ТОВАРОВ"
+CATEGORY_ORDERS: Final[str] = "ЗАКАЗЫ"
+CATEGORY_ITEMS: Final[str] = "ЗАКАЗАННЫЕ ТОВАРЫ"
 
 CATEGORIES: Final[Sequence[str]] = [
     CATEGORY_PRODUCTS,
     CATEGORY_WAREHOUSES,
     CATEGORY_GENERAL,
     CATEGORY_PRODUCT_CATEGORIES,
+    CATEGORY_ITEMS,
+    CATEGORY_ORDERS,
 ]
-
 
 @dataclass(frozen=True)
 class Command:

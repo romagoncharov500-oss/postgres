@@ -41,29 +41,22 @@ class Warehouse:
     city: str
     address: str
     label: str | None
-    is_central: bool 
+    is_central: bool
+
 
 def _get_central_warehouse() -> Warehouse:
     conn = get_conn()
     cur = conn.cursor(row_factory=class_row(Warehouse))
     cur.execute("SELECT * FROM catalog.warehouses WHERE is_central")
-    warehouses: list[Warehouse] = cur.fetchall()
-    if len(warehouses)>1: 
-        render_error("Более одного склада являются центральными")
-    if len(warehouses)==1:
-        return warehouses[0]
-    else:
-        render_error("Центральный склад не найден") 
-
-def _central_exist() -> bool:
-    warehouse = _get_central_warehouse()
+    warehouse: Warehouse = cur.fetchone()
     return warehouse
+
 
 def _update_central() -> None:
     conn = get_conn()
     central_warehouse = _get_central_warehouse()
-    conn.execute("UPDATE catalog.warehouses SET is_central = %s WHERE id = %s", ("FALSE", central_warehouse.id)) 
-
+    conn.execute("UPDATE catalog.warehouses SET is_central = %s WHERE id = %s", (False, central_warehouse.id))
+    
 
 def _render_warehouse(warehouse: Warehouse) -> None:
     table = Table(show_header=False, box=None, padding=(0, 2))
@@ -133,9 +126,9 @@ def add_warehouse() -> None:
     city = prompt("Город: ", validator=city_validator, completer=city_completer).strip()
     address = prompt("Адрес: ", validator=NonEmptyValidator()).strip()
     label = prompt("Метка (необязательно): ").strip() or None
-    is_central = "TRUE"
+    is_central = True
 
-    if _central_exist():
+    if _get_central_warehouse():
         is_central = prompt("Центральный: ", validator=YesNoValidator()).strip() 
         if YesNoValidator.is_yes(is_central):
             _update_central()
