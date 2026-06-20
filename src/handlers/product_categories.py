@@ -8,6 +8,7 @@ from rich.table import Table
 from console import console, render_error
 from db import get_conn
 from commands import command, CATEGORY_PRODUCT_CATEGORIES
+from auth import ROLE_CATALOG_MANAGER
 from validators import ChoiceValidator, NonEmptyValidator, YesNoValidator
 
 categories = [
@@ -48,7 +49,7 @@ def _render_category(category) -> None:
 
     console.print(panel)
 
-@command("list categories", "список всех категорий", CATEGORY_PRODUCT_CATEGORIES)
+@command("list categories", "список всех категорий", CATEGORY_PRODUCT_CATEGORIES, [ROLE_CATALOG_MANAGER])
 def list_product_categories()-> None:
     conn = get_conn()
     table = Table(title="Категории", show_header=True, header_style="bold cyan")
@@ -67,7 +68,7 @@ def list_product_categories()-> None:
         )
     console.print(table)
 
-@command("show category", "информация о складе", CATEGORY_PRODUCT_CATEGORIES)
+@command("show category", "информация о складе", CATEGORY_PRODUCT_CATEGORIES, [ROLE_CATALOG_MANAGER])
 def show_product_category(_id: str) -> None:
     conn = get_conn()
     with conn.cursor(row_factory=class_row(Category)) as cur:
@@ -80,7 +81,7 @@ def show_product_category(_id: str) -> None:
 
     _render_category(category)
 
-@command("add category", "добавить категорию (интерактивно)", CATEGORY_PRODUCT_CATEGORIES)
+@command("add category", "добавить категорию (интерактивно)", CATEGORY_PRODUCT_CATEGORIES, [ROLE_CATALOG_MANAGER])
 def add_product_category() -> None:
     conn = get_conn()
     name = prompt("Категория: ", validator=name_validator, completer=name_completer).strip()
@@ -91,7 +92,7 @@ def add_product_category() -> None:
     
     console.print(f"[green]Категория {name} добавлена [/green]")
 
-@command("edit category", "редактировать категорию", CATEGORY_PRODUCT_CATEGORIES)
+@command("edit category", "редактировать категорию", CATEGORY_PRODUCT_CATEGORIES, [ROLE_CATALOG_MANAGER])
 def edit_product_category(_id: str) -> None:
     conn = get_conn()
     with conn.cursor(row_factory=class_row(Category)) as cur:
@@ -119,7 +120,7 @@ def edit_product_category(_id: str) -> None:
     
 
 
-@command("delete category", "удалить склад", CATEGORY_PRODUCT_CATEGORIES)
+@command("delete category", "удалить склад", CATEGORY_PRODUCT_CATEGORIES, [ROLE_CATALOG_MANAGER])
 def delete_product_category(_id: str) -> None:
     conn = get_conn()
     with conn.cursor(row_factory=class_row(Category)) as cur:

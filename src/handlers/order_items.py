@@ -10,6 +10,7 @@ from console import console, render_error
 from db import get_conn
 from validators import PositiveIntValidator, YesNoValidator
 from commands import command, CATEGORY_ITEMS
+from auth import ROLE_SALES_MANAGER
 from handlers.products import Product
 
 
@@ -82,7 +83,7 @@ def _choose_order_item(order_id: int) -> Item:
     return item_id_to_edit
 
 
-@command("add item", "добавить товары к заказу (интерактивно)", CATEGORY_ITEMS)
+@command("add item", "добавить товары к заказу (интерактивно)", CATEGORY_ITEMS, [ROLE_SALES_MANAGER])
 def add_item(_id: str) -> None:
     order_id = int(_id)
 
@@ -131,7 +132,7 @@ def add_item(_id: str) -> None:
             break
 
 
-@command("edit item", "изменить количество товара в заказе", CATEGORY_ITEMS)
+@command("edit item", "изменить количество товара в заказе", CATEGORY_ITEMS, [ROLE_SALES_MANAGER])
 def edit_item(_id: str) -> None:
     order_id = int(_id)
 
@@ -152,7 +153,7 @@ def edit_item(_id: str) -> None:
     console.print(f"[green] Количество успешно обновлено на {new_quantity} для позиции в заказе ID: {order_id}.[/green]")
     
 
-@command("delete item", "удалить товар из заказа", CATEGORY_ITEMS)
+@command("delete item", "удалить товар из заказа", CATEGORY_ITEMS, [ROLE_SALES_MANAGER])
 def delete_item(_id: str) -> None:
     order_id = int(_id)
  

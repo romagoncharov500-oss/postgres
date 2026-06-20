@@ -12,6 +12,7 @@ from console import console, render_error
 from db import get_conn
 from validators import ChoiceValidator, PositiveIntValidator, YesNoValidator
 from commands import command, CATEGORY_ORDERS
+from auth import ROLE_SALES_MANAGER
 from handlers.order_items import add_item
 
 
@@ -81,7 +82,7 @@ def _render_order(order: Order) -> None:
     console.print(panel)
 
 
-@command("list orders", "список всех заказов", CATEGORY_ORDERS)
+@command("list orders", "список всех заказов", CATEGORY_ORDERS, [ROLE_SALES_MANAGER])
 def list_orders() -> None:
     conn = get_conn()
     table = Table(title="Заказы", show_header=True, header_style="bold cyan")
@@ -107,7 +108,7 @@ def list_orders() -> None:
     console.print(table)
         
 
-@command("show orders", "информация о заказах", CATEGORY_ORDERS)
+@command("show orders", "информация о заказах", CATEGORY_ORDERS, [ROLE_SALES_MANAGER])
 def show_order(_id: str) -> None:
     order = _get_order(int(_id))
     if order is None:
@@ -115,7 +116,7 @@ def show_order(_id: str) -> None:
     else:
         _render_order(order)
     
-@command("add order", "добавить новый заказ", CATEGORY_ORDERS)
+@command("add order", "добавить новый заказ", CATEGORY_ORDERS, [ROLE_SALES_MANAGER])
 def add_order() -> None:
     warehouse_id_str = prompt("ID склада для отгрузки: ", validator=PositiveIntValidator())
     warehouse_id = int(warehouse_id_str)
@@ -139,7 +140,7 @@ def add_order() -> None:
         add_item(str(new_order_id))
 
 
-@command("edit order", "изменить статус или склад заказа", CATEGORY_ORDERS)
+@command("edit order", "изменить статус или склад заказа", CATEGORY_ORDERS, [ROLE_SALES_MANAGER])
 def edit_order(_id: str) -> None:
     conn = get_conn()
     order_id = int(_id)
@@ -163,7 +164,7 @@ def edit_order(_id: str) -> None:
     console.print(f"[green] Заказ ID: {order.id} успешно обновлен.[/green]")
 
 
-@command("publish order", "опубликовать заказ (сменить статус на new)", CATEGORY_ORDERS)
+@command("publish order", "опубликовать заказ (сменить статус на new)", CATEGORY_ORDERS, [ROLE_SALES_MANAGER])
 def publish_order(_id: str) -> None:
 
     order_id = int(_id)
@@ -187,7 +188,7 @@ def publish_order(_id: str) -> None:
     console.print(f"[green] Заказ ID: {order_id} успешно опубликован (статус изменен на 'new').[/green]")
 
 
-@command("delete order", "удалить заказ", CATEGORY_ORDERS)
+@command("delete order", "удалить заказ", CATEGORY_ORDERS, [ROLE_SALES_MANAGER])
 def delete_order(_id: str) -> None:
     conn = get_conn()
     order_id = int(_id)
