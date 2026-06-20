@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from commands import command, CATEGORY_PRODUCTS
+from auth import ROLE_CATALOG_MANAGER, ROLE_SALES_MANAGER
 
 from db import get_conn
 from rich.table import Table
@@ -48,7 +49,7 @@ def _render_product(product: Product):  # pylint: disable=unused-argument
     console.print(panel)
 
 
-@command("list products", "список всех товаров", CATEGORY_PRODUCTS)
+@command("list products", "список всех товаров", CATEGORY_PRODUCTS, [ROLE_CATALOG_MANAGER, ROLE_SALES_MANAGER])
 def list_products() -> None:
     """
     Выводит список всех продуктов из таблицы catalog.products.
@@ -79,7 +80,7 @@ def list_products() -> None:
     console.print(table)
 
 
-@command("show product", "информация о товаре", CATEGORY_PRODUCTS)
+@command("show product", "информация о товаре", CATEGORY_PRODUCTS, [ROLE_CATALOG_MANAGER, ROLE_SALES_MANAGER])
 def show_product(_id: str) -> None:
     """
     Показывает детальную информацию о продукте по его ID.
@@ -98,7 +99,7 @@ def show_product(_id: str) -> None:
     _render_product(product)
 
 
-@command("add product", "добавить товар (интерактивно)", CATEGORY_PRODUCTS)
+@command("add product", "добавить товар (интерактивно)", CATEGORY_PRODUCTS, [ROLE_CATALOG_MANAGER])
 def add_product() -> None:
     """
     Добавляет новый продукт в базу данных.
@@ -118,7 +119,7 @@ def add_product() -> None:
     console.print(f"[green]Товар {name} добавлен [/green]")   
 
 
-@command("edit product", "редактировать товар", CATEGORY_PRODUCTS)
+@command("edit product", "редактировать товар", CATEGORY_PRODUCTS, [ROLE_CATALOG_MANAGER])
 def edit_product(_id: str) -> None:
     """
     Редактирует существующий продукт.
@@ -150,7 +151,7 @@ def edit_product(_id: str) -> None:
     console.print(f"[green]Товар {name} обновлен [/green]")
 
 
-@command("delete product", "удалить товар", CATEGORY_PRODUCTS)
+@command("delete product", "удалить товар", CATEGORY_PRODUCTS, [ROLE_CATALOG_MANAGER])
 def delete_product(_id: str) -> None:
     """
     Удаляет продукт из базы данных.
