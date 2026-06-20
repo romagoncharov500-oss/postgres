@@ -1,5 +1,7 @@
 .idea
 .venv
+.vscode
+backups
 postgresql_data
 __pycache__
 .mypy_cache
