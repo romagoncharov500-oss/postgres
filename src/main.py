@@ -1,7 +1,9 @@
 import logging
+import argparse
 
 from prompt_toolkit import PromptSession
 
+from auth import login
 from console import console, render_error
 from db import connect, DB_USER, close
 from setup import setup_logger
@@ -16,6 +18,11 @@ setup_logger(psycopg_log_level=logging.INFO)
 
 def main() -> None:
     # Подключение к БД
+    parser = argparse.ArgumentParser(description="Inventory Management System")
+    parser.add_argument("-u", "--username", help="Username for authentication")
+    parser.add_argument("-p", "--password", help="Password for authentication")
+    cli_args = parser.parse_args()
+
     connect()
     logging.info("App Started")
 
@@ -24,6 +31,8 @@ def main() -> None:
     console.print("[bold cyan]   Inventory Management System[/bold cyan]")
     console.print("[bold cyan]═══════════════════════════════════════[/bold cyan]")
     console.print(f"[dim]Подключено к БД: warehouse_db (user: {DB_USER})[/dim]\n")
+
+    login(username=cli_args.username, password=cli_args.password)
 
     # Создаём сессию prompt_toolkit с автодополнением команд.
     # https://python-prompt-toolkit.readthedocs.io/en/stable/pages/asking_for_input.html#the-promptsession-object
