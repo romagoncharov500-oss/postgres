@@ -18,3 +18,13 @@ GRANT SELECT ON ALL TABLES IN SCHEMA catalog TO sales_manager;
 -- 5. Будущие таблицы в catalog должны быть доступны на чтение ВСЕМ (включая sales_manager)
 ALTER DEFAULT PRIVILEGES FOR ROLE app_user IN SCHEMA catalog 
     GRANT SELECT ON TABLES TO PUBLIC;
+
+-- 6. права на СУЩЕСТВУЮЩИЕ последовательности
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA catalog TO catalog_manager;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA sales TO sales_manager;
+
+-- 7. права на БУДУЩИЕ последовательности
+ALTER DEFAULT PRIVILEGES FOR ROLE app_user IN SCHEMA catalog 
+    GRANT USAGE ON SEQUENCES TO catalog_manager;
+ALTER DEFAULT PRIVILEGES FOR ROLE app_user IN SCHEMA sales 
+    GRANT USAGE ON SEQUENCES TO sales_manager;
