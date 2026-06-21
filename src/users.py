@@ -22,7 +22,7 @@ def find_user_by_login_and_pass(username: str, password: str) -> User | None:
 def get_user(id_: int) -> User:
     conn = get_conn()
     with conn.cursor(row_factory=class_row(User)) as cur:
-        cur.execute("SELECT (id, username, role) FROM auth.users WHERE id = %s", (id_,))
+        cur.execute("SELECT id, username, role FROM auth.users WHERE id = %s", (id_,))
         user = cur.fetchone()
     
     return user
