@@ -14,6 +14,8 @@ from validators import ChoiceValidator, PositiveIntValidator, YesNoValidator
 from commands import command, CATEGORY_ORDERS
 from auth import ROLE_SALES_MANAGER
 from handlers.order_items import add_item
+from auth import auth_user
+from users import get_user
 
 
 valid_statuses = [
@@ -38,6 +40,7 @@ class Order:
     total_amount: Decimal
     created_at: datetime
     warehouse_id: int
+    created_by: int
 
 
 def _get_order(_id: int) -> Order | None:
@@ -68,9 +71,10 @@ def _render_order(order: Order) -> None:
 
     table.add_row("ID", str(order.id))
     table.add_row("Статус", order.status)
-    table.add_row("Общяя сумма:", order.total_amount)
+    table.add_row("Общая сумма:", order.total_amount)
     table.add_row("Создан:", order.created_at or "")
     table.add_row("Склад (ID):", str(order.warehouse_id))
+    table.add_row("Создал", get_user(order.created_by).username)
 
     panel = Panel(
         table,
@@ -92,6 +96,7 @@ def list_orders() -> None:
     table.add_column("Общяя сумма", style="yellow", min_width=30)
     table.add_column("Создан", style="magenta", min_width=15)
     table.add_column("Склад", style="magenta", min_width=15)
+    table.add_column("Создал", style="magenta", min_width=15)
 
     with conn.cursor(row_factory=class_row(Order)) as cur:
         cur.execute("SELECT * FROM sales.orders")
@@ -103,7 +108,8 @@ def list_orders() -> None:
             order.status,
             str(order.total_amount),
             str(order.created_at),
-            str(order.warehouse_id)
+            str(order.warehouse_id),
+            get_user(order.created_by).username
         )
     console.print(table)
         
@@ -127,8 +133,8 @@ def add_order() -> None:
     # Создаем заказ и сразу получаем его новый ID через RETURNING
     with conn.cursor() as cur:
         cur.execute(
-            "INSERT INTO sales.orders (status, total_amount, warehouse_id) VALUES (%s, %s, %s) RETURNING id",
-            (status, 0.00, warehouse_id) # total_amount изначально 0, пересчитается при добавлении товаров
+            "INSERT INTO sales.orders (status, total_amount, warehouse_id, created_by) VALUES (%s, %s, %s, %s) RETURNING id",
+            (status, 0.00, warehouse_id, auth_user().id) # total_amount изначально 0, пересчитается при добавлении товаров
         )
         new_order_id = cur.fetchone()[0]
 
