@@ -1,5 +1,5 @@
 -- 1. Откатываем права на использование схем
-REVOKE USAGE ON SCHEMA catalog FROM catalog_manager, sales_manager;
+REVOKE USAGE ON SCHEMA catalog FROM PUBLIC;
 REVOKE USAGE ON SCHEMA sales FROM sales_manager;
 
 -- 2. Откатываем права на существующие таблицы в catalog
@@ -22,7 +22,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE app_user IN SCHEMA catalog
     REVOKE SELECT ON TABLES FROM PUBLIC;
 
 -- 4. Откат прав на последовательности
-REVOKE USAGE ON ALL SEQUENCES IN SCHEMA catalog FROM catalog_manager;
+REVOKE USAGE ON ALL SEQUENCES IN SCHEMA catalog FROM PUBLIC;
 REVOKE USAGE ON ALL SEQUENCES IN SCHEMA sales FROM sales_manager;
 
 -- 5. Откат ALTER DEFAULT PRIVILEGES для последовательностей
