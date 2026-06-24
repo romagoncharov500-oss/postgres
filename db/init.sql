@@ -43,3 +43,13 @@ INSERT INTO auth.users (username, password, role) VALUES
 -- Членство в ролях
 GRANT catalog_manager TO supervisor;
 GRANT sales_manager TO supervisor;
+
+-- =====================================
+-- TASK 5
+-- =====================================
+CREATE ROLE inventory_manager WITH LOGIN PASSWORD 'impss';
+CREATE ROLE worker WITH LOGIN PASSWORD 'wpss';
+
+INSERT INTO auth.users (username, password, role) VALUES
+('invent_man', crypt('impss', gen_salt('bf')), 'inventory_manager'),
+('worker', crypt('wpss', gen_salt('bf')), 'worker'),
