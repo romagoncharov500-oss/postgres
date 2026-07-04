@@ -18,6 +18,8 @@ _CONN: Connection | None = None
 
 def connect() -> None:
     global _CONN
+    if _CONN is not None:
+        return
     _CONN = psycopg.connect(
         dbname=DB_NAME,
         user=DB_USER,
@@ -35,5 +37,5 @@ def close() -> None:
 
 def get_conn() -> Connection:
     if _CONN is None:
-        raise RuntimeError("Database connection has not been established")
+        connect()
     return _CONN
