@@ -1,39 +1,16 @@
 from dataclasses import dataclass
 
 from prompt_toolkit import prompt
-from prompt_toolkit.completion import WordCompleter
 from psycopg.rows import class_row
 from rich.panel import Panel
 from rich.table import Table
 
 from console import console, render_error
 from db import get_conn
-from validators import ChoiceValidator, NonEmptyValidator, YesNoValidator
+from validators import NonEmptyValidator, YesNoValidator
 from commands import command, CATEGORY_WAREHOUSES
 from auth import ROLE_CATALOG_MANAGER, ROLE_SALES_MANAGER
-
-cities = [
-    "Москва",
-    "Санкт-Петербург",
-    "Новосибирск",
-    "Екатеринбург",
-    "Казань",
-    "Нижний Новгород",
-    "Челябинск",
-    "Самара",
-    "Омск",
-    "Ростов-на-Дону",
-    "Красноярск",
-    "Воронеж",
-    "Пермь",
-    "Уфа",
-    "Волгоград",
-]
-city_completer = WordCompleter(cities, ignore_case=True, sentence=True)
-
-city_validator = ChoiceValidator(
-    cities, message="Город должен быть из списка. Используйте Tab для автодополнения."
-)
+from cities import city_validator, city_completer
 
 
 @dataclass
