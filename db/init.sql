@@ -50,6 +50,9 @@ GRANT sales_manager TO supervisor;
 CREATE ROLE inventory_manager WITH LOGIN PASSWORD 'impss';
 CREATE ROLE worker WITH LOGIN PASSWORD 'wpss';
 
+ALTER TABLE auth.users DROP CONSTRAINT role_check;
+ALTER TABLE auth.users ADD  CONSTRAINT role_check CHECK (role IN ('sales_manager', 'catalog_manager', 'inventory_manager', 'worker'));
+
 INSERT INTO auth.users (username, password, role) VALUES
 ('invent_man', crypt('impss', gen_salt('bf')), 'inventory_manager'),
-('worker', crypt('wpss', gen_salt('bf')), 'worker'),
+('worker', crypt('wpss', gen_salt('bf')), 'worker');
