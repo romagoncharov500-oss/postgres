@@ -20,4 +20,7 @@ INSERT INTO catalog.cities (name) VALUES
     ('Уфа'),
     ('Волгоград');
 
-GRANT SELECT ON TABLE catalog.cities TO PUBLIC;
+ALTER TABLE catalog.warehouses
+    ADD CONSTRAINT warehouse_city_ref 
+    FOREIGN KEY (city)
+    REFERENCES catalog.cities (name)
