@@ -1,6 +1,7 @@
 .idea
 .venv
 .vscode
+*.lua
 backups
 postgresql_data
 __pycache__
