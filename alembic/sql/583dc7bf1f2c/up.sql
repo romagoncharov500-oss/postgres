@@ -31,8 +31,7 @@ CREATE TABLE inventory.reserves(
 );
 
 CREATE TABLE inventory.deliveries(
-    id serial PRIMARY KEY,
-    order_id int NOT NULL,
+    order_id int NOT NULL PRIMARY KEY,
     status text DEFAULT 'planned' NOT NULL,
     created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     shipped_at timestamptz,
@@ -41,14 +40,14 @@ CREATE TABLE inventory.deliveries(
 );
 
 CREATE TABLE inventory.delivery_items(
-    delivery_id int NOT NULL,
+    order_id int NOT NULL,
     product_id  int NOT NULL,
     quantity    int NOT NULL,
     status text DEFAULT 'planned' NOT NULL,
     CONSTRAINT delivery_items_status_check CHECK (status IN ('planned', 'shipped')),
-    CONSTRAINT delivery_id_ref FOREIGN KEY (delivery_id) REFERENCES inventory.deliveries (id),
+    CONSTRAINT delivery_id_ref FOREIGN KEY (order_id) REFERENCES inventory.deliveries (order_id),
     CONSTRAINT product_id_ref FOREIGN KEY (product_id) REFERENCES catalog.products (id),
-    PRIMARY KEY(delivery_id, product_id)
+    PRIMARY KEY(order_id, product_id)
 );
 
 CREATE TABLE inventory.transfers (
