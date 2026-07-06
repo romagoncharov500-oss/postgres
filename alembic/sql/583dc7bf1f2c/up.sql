@@ -55,7 +55,6 @@ CREATE TABLE inventory.transfers (
     id serial PRIMARY KEY,
     from_warehouse_id int NOT NULL, 
     to_warehouse_id   int NOT NULL,
-    total_amount numeric(10, 2) NOT NULL DEFAULT 0,
     status text NOT NULL DEFAULT 'planned',
     created_at  timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     started_at  timestamptz,
