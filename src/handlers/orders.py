@@ -102,14 +102,7 @@ def _render_order(order: Order) -> None:
 @command("list orders", "список всех заказов", CATEGORY_ORDERS, [ROLE_SALES_MANAGER, ROLE_INVENTORY_MANAGER])
 def list_orders() -> None:
     conn = get_conn()
-    table = Table(title="Заказы", show_header=True, header_style="bold cyan")
-
-    table.add_column("ID", style="dim", width=6, justify="right")
-    table.add_column("Статус", style="green", min_width=20)
-    table.add_column("Общяя сумма", style="yellow", min_width=30)
-    table.add_column("Создан", style="magenta", min_width=15)
-    table.add_column("Склад", style="magenta", min_width=15)
-    table.add_column("Создал", style="magenta", min_width=15)
+    table = _create_orders_table()
 
     with conn.cursor(row_factory=class_row(Order)) as cur:
         cur.execute("SELECT * FROM sales.orders")
