@@ -63,6 +63,19 @@ def _has_unpublished_status(_order : Order) -> bool:
         return True
 
 
+def _create_orders_table() -> Table:
+    table = Table(title="Заказы", show_header=True, header_style="bold cyan")
+
+    table.add_column("ID", style="dim", width=6, justify="right")
+    table.add_column("Статус", style="green", min_width=20)
+    table.add_column("Общая сумма", style="yellow", min_width=30)
+    table.add_column("Создан", style="magenta", min_width=15)
+    table.add_column("Склад", style="magenta", min_width=15)
+    table.add_column("Создал", style="magenta", min_width=15)
+
+    return table
+
+
 def _render_order(order: Order) -> None:
     table = Table(show_header=False, box=None, padding=(0, 2))
 
