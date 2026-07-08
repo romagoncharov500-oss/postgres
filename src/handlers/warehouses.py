@@ -9,7 +9,7 @@ from console import console, render_error
 from db import get_conn
 from validators import NonEmptyValidator, YesNoValidator
 from commands import command, CATEGORY_WAREHOUSES
-from auth import ROLE_CATALOG_MANAGER, ROLE_SALES_MANAGER
+from auth import ROLE_CATALOG_MANAGER, ALL_ROLES
 from cities import city_validator, city_completer, _get_city_name, _get_city_id
 
 
@@ -58,7 +58,7 @@ def _render_warehouse(warehouse: Warehouse) -> None:
     console.print(panel)
 
 
-@command("list warehouses", "список всех складов", CATEGORY_WAREHOUSES, [ROLE_CATALOG_MANAGER, ROLE_SALES_MANAGER])
+@command("list warehouses", "список всех складов", CATEGORY_WAREHOUSES, ALL_ROLES)
 def list_warehouses() -> None:
     conn = get_conn()
     table = Table(title="Склады", show_header=True, header_style="bold cyan")
@@ -84,7 +84,7 @@ def list_warehouses() -> None:
     console.print(table)
 
 
-@command("show warehouse", "информация о складе", CATEGORY_WAREHOUSES, [ROLE_CATALOG_MANAGER, ROLE_SALES_MANAGER])
+@command("show warehouse", "информация о складе", CATEGORY_WAREHOUSES, ALL_ROLES)
 def show_warehouse(_id: str) -> None:
     conn = get_conn()
     with conn.cursor(row_factory=class_row(Warehouse)) as cur:
