@@ -5,6 +5,7 @@ from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
 from prompt_toolkit.shortcuts import choice
 from psycopg.rows import class_row, scalar_row
+from rich.table import Table
 
 from console import console, render_error
 from db import get_conn
