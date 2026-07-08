@@ -179,6 +179,7 @@ def show_order(_id: str) -> None:
         return
     else:
         _render_order(order)
+
     
 @command("add order", "добавить новый заказ", CATEGORY_ORDERS, [ROLE_SALES_MANAGER])
 def add_order() -> None:
