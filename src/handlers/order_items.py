@@ -22,6 +22,54 @@ class Item:
     price: Decimal
 
 
+@dataclass
+class OrderItemInfo:
+    product_name: str
+    price: Decimal
+    quantity: int
+    item_status: str
+
+
+def _get_order_items_info(order_id: int) -> list[OrderItemInfo]:
+    query = """
+        SELECT
+            p.name AS product_name,
+            oi.price,
+            oi.quantity,
+            CASE
+                WHEN di.status = 'shipped' THEN 'отгружено'
+                WHEN di.status = 'planned' THEN 'запланирована отгрузка'
+                WHEN r.id IS NOT NULL AND r.quantity >= oi.quantity THEN 'в резерве'
+                WHEN ti.id IS NOT NULL THEN
+                    'в пути из ' || COALESCE(w.name, '?') ||
+                    CASE
+                        WHEN t.arriving_at IS NOT NULL
+                        THEN ', ожидается ' || to_char(t.arriving_at, 'DD.MM.YYYY HH24:MI')
+                        ELSE ''
+                    END
+                ELSE 'ожидает обработки'
+            END AS item_status
+        FROM sales.order_items oi
+        JOIN catalog.products p ON p.id = oi.product_id
+        LEFT JOIN inventory.reserves r
+            ON r.order_id = oi.order_id AND r.product_id = oi.product_id
+        LEFT JOIN inventory.delivery_items di
+            ON di.order_id = oi.order_id AND di.product_id = oi.product_id
+        LEFT JOIN inventory.transfer_items ti
+            ON ti.reserve_id = r.id
+        LEFT JOIN inventory.transfers t
+            ON t.id = ti.transfer_id
+        LEFT JOIN catalog.warehouses w
+            ON w.id = t.from_warehouse_id
+        WHERE oi.order_id = %s
+        ORDER BY oi.product_id;
+    """
+    conn = get_conn()
+    with conn.cursor(row_factory=class_row(OrderItemInfo)) as cur:
+        cur.execute(query, (order_id,))
+        return cur.fetchall()
+
+
 def _get_availible_products(_order_id: int) -> list[Product]:
     conn = get_conn()
     with conn.cursor(row_factory=class_row(Product)) as cur:
