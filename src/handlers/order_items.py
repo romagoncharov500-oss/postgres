@@ -71,6 +71,17 @@ def _get_order_items_info(order_id: int) -> list[OrderItemInfo]:
         return cur.fetchall()
 
 
+def _create_order_item_info_table(_item : Item) -> Table:
+    table = Table(title="Позиции заказа", show_header=True, header_style="bold cyan")
+
+    table.add_column("Продукт", style="dim", width=15, justify="right")
+    table.add_column("Цена", style="green", min_width=20)
+    table.add_column("Количество", style="yellow", min_width=10)
+    table.add_column("Статус", style="magenta", min_width=20)
+
+    return table
+
+
 def _get_availible_products(_order_id: int) -> list[Product]:
     conn = get_conn()
     with conn.cursor(row_factory=class_row(Product)) as cur:
