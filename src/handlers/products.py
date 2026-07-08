@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 from commands import command, CATEGORY_PRODUCTS
-from auth import ROLE_CATALOG_MANAGER, ROLE_SALES_MANAGER
+from auth import ROLE_CATALOG_MANAGER, ALL_ROLES
 
 from db import get_conn
 from rich.table import Table
@@ -49,7 +49,7 @@ def _render_product(product: Product):  # pylint: disable=unused-argument
     console.print(panel)
 
 
-@command("list products", "список всех товаров", CATEGORY_PRODUCTS, [ROLE_CATALOG_MANAGER, ROLE_SALES_MANAGER])
+@command("list products", "список всех товаров", CATEGORY_PRODUCTS, ALL_ROLES)
 def list_products() -> None:
     """
     Выводит список всех продуктов из таблицы catalog.products.
@@ -80,7 +80,7 @@ def list_products() -> None:
     console.print(table)
 
 
-@command("show product", "информация о товаре", CATEGORY_PRODUCTS, [ROLE_CATALOG_MANAGER, ROLE_SALES_MANAGER])
+@command("show product", "информация о товаре", CATEGORY_PRODUCTS, ALL_ROLES)
 def show_product(_id: str) -> None:
     """
     Показывает детальную информацию о продукте по его ID.
