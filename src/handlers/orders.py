@@ -12,7 +12,7 @@ from console import console, render_error
 from db import get_conn
 from validators import ChoiceValidator, PositiveIntValidator, YesNoValidator
 from commands import command, CATEGORY_ORDERS
-from auth import ROLE_SALES_MANAGER
+from auth import ROLE_SALES_MANAGER, ROLE_INVENTORY_MANAGER
 from handlers.order_items import add_item
 from auth import auth_user
 from users import get_user
