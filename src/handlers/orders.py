@@ -13,7 +13,8 @@ from db import get_conn
 from validators import ChoiceValidator, PositiveIntValidator, YesNoValidator
 from commands import command, CATEGORY_ORDERS
 from auth import ROLE_SALES_MANAGER, ROLE_INVENTORY_MANAGER
-from handlers.order_items import add_item
+from handlers.order_items import add_item, _get_order_items_info, _create_order_item_info_table
+from handlers.warehouses import _get_warehouse_location
 from auth import auth_user
 from users import get_user
 
@@ -77,26 +78,45 @@ def _create_orders_table() -> Table:
 
 
 def _render_order(order: Order) -> None:
-    table = Table(show_header=False, box=None, padding=(0, 2))
+    # Основная информация о заказе
+    info_table = Table(show_header=False, box=None, padding=(0, 2))
+    info_table.add_column("Поле", style="bold cyan", width=20)
+    info_table.add_column("Значение", style="white")
 
-    table.add_column("Поле", style="bold cyan", width=15)
-    table.add_column("Значение", style="white")
+    warehouse_location = _get_warehouse_location(order.warehouse_id)
+    created_by_user = get_user(order.created_by)
+    created_at_str = order.created_at.strftime("%d.%m.%Y %H:%M") if order.created_at else ""
 
-    table.add_row("ID", str(order.id))
-    table.add_row("Статус", order.status)
-    table.add_row("Общая сумма:", order.total_amount)
-    table.add_row("Создан:", order.created_at or "")
-    table.add_row("Склад (ID):", str(order.warehouse_id))
-    table.add_row("Создал", get_user(order.created_by).username)
+    info_table.add_row("ID", str(order.id))
+    info_table.add_row("Статус", order.status)
+    info_table.add_row("Общая сумма", f"{order.total_amount:.2f}")
+    info_table.add_row("Создан", created_at_str)
+    info_table.add_row("Склад отгрузки", f"{warehouse_location} (ID: {order.warehouse_id})")
+    info_table.add_row("Создал", created_by_user.username)
 
-    panel = Panel(
-        table,
+    order_panel = Panel(
+        info_table,
         expand=False,
         title=f"[bold green]Заказ ID: {order.id}[/bold green]",
         border_style="green",
     )
+    console.print(order_panel)
 
-    console.print(panel)
+    # Позиции заказа
+    items = _get_order_items_info(order.id)
+    if not items:
+        console.print("[yellow]Позиции заказа не найдены[/yellow]")
+        return
+
+    items_table = _create_order_item_info_table()
+    for item in items:
+        items_table.add_row(
+            item.product_name,
+            f"{item.price:.2f}",
+            str(item.quantity),
+            item.item_status,
+        )
+    console.print(items_table)
 
 
 @command("list orders", "список всех заказов", CATEGORY_ORDERS, [ROLE_SALES_MANAGER, ROLE_INVENTORY_MANAGER])
@@ -172,7 +192,7 @@ def list_orders_my() -> None:
 
 
 
-@command("show orders", "информация о заказах", CATEGORY_ORDERS, [ROLE_SALES_MANAGER])
+@command("show orders", "информация о заказах", CATEGORY_ORDERS, [ROLE_SALES_MANAGER, ROLE_INVENTORY_MANAGER])
 def show_order(_id: str) -> None:
     order = _get_order(int(_id))
     if order is None:
