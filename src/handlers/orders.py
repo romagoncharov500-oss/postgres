@@ -120,6 +120,26 @@ def list_orders() -> None:
     console.print(table)
         
 
+def _list_orders_by_status(status: str) -> None:
+    conn = get_conn()
+    table = _create_orders_table()
+
+    with conn.cursor(row_factory=class_row(Order)) as cur:
+        cur.execute("SELECT * FROM sales.orders WHERE status = %s", (status,))
+        orders: list[Order] = cur.fetchall()
+
+    for order in orders:
+        table.add_row(
+            str(order.id),
+            order.status,
+            str(order.total_amount),
+            str(order.created_at),
+            str(order.warehouse_id),
+            get_user(order.created_by).username
+        )
+    console.print(table)
+
+
 @command("show orders", "информация о заказах", CATEGORY_ORDERS, [ROLE_SALES_MANAGER])
 def show_order(_id: str) -> None:
     order = _get_order(int(_id))
