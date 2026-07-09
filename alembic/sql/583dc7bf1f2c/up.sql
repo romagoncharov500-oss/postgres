@@ -99,7 +99,7 @@ GRANT USAGE ON SCHEMA inventory TO worker;
 GRANT SELECT ON ALL TABLES IN SCHEMA inventory TO worker;
 
 GRANT ALL ON TABLE inventory.stock TO worker;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA inventory;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA inventory TO worker;
 GRANT UPDATE ON TABLE inventory.reserves TO worker;
 
 GRANT UPDATE (status, shipped_at) ON TABLE inventory.deliveries TO worker;
