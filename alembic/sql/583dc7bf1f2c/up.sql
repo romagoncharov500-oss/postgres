@@ -82,9 +82,10 @@ CREATE TABLE inventory.transfer_items (
 -- ============ inventory_manager ============
 GRANT ALL ON SCHEMA inventory TO inventory_manager;
 GRANT ALL ON ALL TABLES IN SCHEMA inventory TO inventory_manager;
-GRANT USAGE ON ALL SEQUENCES IN SCHEMA inventory TO inventory_manager;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA inventory TO inventory_manager;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA sales TO inventory_manager;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA sales TO inventory_manager;
 GRANT UPDATE (status) ON TABLE sales.orders TO inventory_manager;
 
 ALTER DEFAULT PRIVILEGES FOR ROLE app_user IN SCHEMA inventory
@@ -98,6 +99,7 @@ GRANT USAGE ON SCHEMA inventory TO worker;
 GRANT SELECT ON ALL TABLES IN SCHEMA inventory TO worker;
 
 GRANT ALL ON TABLE inventory.stock TO worker;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA inventory;
 GRANT UPDATE ON TABLE inventory.reserves TO worker;
 
 GRANT UPDATE (status, shipped_at) ON TABLE inventory.deliveries TO worker;
