@@ -8,7 +8,7 @@ from rich.table import Table
 from console import console, render_error
 from db import get_conn
 from commands import command, CATEGORY_PRODUCT_CATEGORIES
-from auth import ROLE_CATALOG_MANAGER
+from auth import ROLE_CATALOG_MANAGER, ALL_ROLES
 from validators import ChoiceValidator, NonEmptyValidator, YesNoValidator
 
 categories = [
@@ -49,7 +49,7 @@ def _render_category(category) -> None:
 
     console.print(panel)
 
-@command("list categories", "список всех категорий", CATEGORY_PRODUCT_CATEGORIES, [ROLE_CATALOG_MANAGER])
+@command("list categories", "список всех категорий", CATEGORY_PRODUCT_CATEGORIES, ALL_ROLES)
 def list_product_categories()-> None:
     conn = get_conn()
     table = Table(title="Категории", show_header=True, header_style="bold cyan")
@@ -68,7 +68,7 @@ def list_product_categories()-> None:
         )
     console.print(table)
 
-@command("show category", "информация о складе", CATEGORY_PRODUCT_CATEGORIES, [ROLE_CATALOG_MANAGER])
+@command("show category", "информация о складе", CATEGORY_PRODUCT_CATEGORIES, ALL_ROLES)
 def show_product_category(_id: str) -> None:
     conn = get_conn()
     with conn.cursor(row_factory=class_row(Category)) as cur:
