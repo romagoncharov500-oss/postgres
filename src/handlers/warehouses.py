@@ -10,13 +10,13 @@ from db import get_conn
 from validators import NonEmptyValidator, YesNoValidator
 from commands import command, CATEGORY_WAREHOUSES
 from auth import ROLE_CATALOG_MANAGER, ROLE_SALES_MANAGER
-from cities import city_validator, city_completer
+from cities import city_validator, city_completer, _get_city_name, _get_city_id
 
 
 @dataclass
 class Warehouse:
     id: int
-    city: str
+    city_id: int
     address: str
     label: str | None
     is_central: bool
@@ -43,7 +43,7 @@ def _render_warehouse(warehouse: Warehouse) -> None:
     table.add_column("Значение", style="white")
 
     table.add_row("ID", str(warehouse.id))
-    table.add_row("Город", warehouse.city)
+    table.add_row("Город", _get_city_name(warehouse.city_id))
     table.add_row("Адрес", warehouse.address)
     table.add_row("Метка", warehouse.label or "")
     table.add_row("Центральный", str(warehouse.is_central))
@@ -76,7 +76,7 @@ def list_warehouses() -> None:
     for warehouse in warehouses:
         table.add_row(
             str(warehouse.id),
-            warehouse.city,
+            _get_city_name(warehouse.city_id),
             warehouse.address,
             warehouse.label or "",
             str(warehouse.is_central)
@@ -106,6 +106,8 @@ def add_warehouse() -> None:
     label = prompt("Метка (необязательно): ").strip() or None
     is_central = True
 
+    city_id = _get_city_id(city)
+
     if _get_central_warehouse():
         is_central = prompt("Центральный: ", validator=YesNoValidator()).strip() 
         if YesNoValidator.is_yes(is_central):
@@ -113,7 +115,7 @@ def add_warehouse() -> None:
 
     conn.execute(
             "INSERT INTO catalog.warehouses (city, address, label, is_central) VALUES (%s, %s, %s, %s)",
-            (city, address, label, is_central),
+            (city_id, address, label, is_central),
     )
 
     if label:
@@ -139,6 +141,8 @@ def edit_warehouse(_id: str) -> None:
         validator=city_validator,
         completer=city_completer,
     ).strip()
+    city_id = _get_city_id(city)
+
     address = prompt(
         "Адрес: ", default=warehouse.address, validator=NonEmptyValidator()
     ).strip()
@@ -158,7 +162,7 @@ def edit_warehouse(_id: str) -> None:
     conn.execute(
         """UPDATE catalog.warehouses SET city = %s, address = %s, label = %s, is_central = %s
         WHERE id = %s""",
-        (city, address, label, is_central, _id),
+        (city_id, address, label, is_central, _id),
     )
         
     if label:
@@ -182,14 +186,14 @@ def delete_warehouse(_id: str) -> None:
         _render_warehouse(warehouse)
 
         answer = prompt("Вы уверены? (y/n, д/н): ", validator=YesNoValidator())
-
+        city_name = _get_city_name(warehouse.city_id)
         if YesNoValidator.is_yes(answer):
             conn.execute("DELETE FROM catalog.warehouses WHERE id = %s", (_id,))
             if warehouse.label:
                 console.print(
-                    f"[green]Склад в городе {warehouse.city} ({warehouse.label}) удален [/green]"
+                    f"[green]Склад в городе {city_name} ({warehouse.label}) удален [/green]"
                 )
             else:
-                console.print(f"[green]Склад в городе {warehouse.city} удален [/green]")
+                console.print(f"[green]Склад в городе {city_name} удален [/green]")
     else:
         console.print(f"[bold red]Склад ID: {_id} является центральным. Чтобы удалить его - назначте центральным другой склад. [/bold red]")
