@@ -20,7 +20,7 @@ INSERT INTO catalog.cities (name) VALUES
     ('Уфа'),
     ('Волгоград');
     
-ALTER TABLE catalog.warehouses ADD COLUMN city_id_ref TEXT;
+ALTER TABLE catalog.warehouses ADD COLUMN city_id_ref INTEGER;
 
 UPDATE catalog.warehouses SET city_id_ref = c.id FROM catalog.cities c WHERE c.name = city; 
 
@@ -31,4 +31,4 @@ ALTER TABLE catalog.warehouses RENAME COLUMN city_id_ref TO city_id;
 ALTER TABLE catalog.warehouses
     ADD CONSTRAINT warehouse_city_ref 
     FOREIGN KEY (city_id)
-    REFERENCES catalog.cities (name);
+    REFERENCES catalog.cities (id);
