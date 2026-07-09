@@ -86,7 +86,7 @@ def _render_order(order: Order) -> None:
     console.print(panel)
 
 
-@command("list orders", "список всех заказов", CATEGORY_ORDERS, [ROLE_SALES_MANAGER])
+@command("list orders", "список всех заказов", CATEGORY_ORDERS, [ROLE_SALES_MANAGER, ROLE_INVENTORY_MANAGER])
 def list_orders() -> None:
     conn = get_conn()
     table = Table(title="Заказы", show_header=True, header_style="bold cyan")
