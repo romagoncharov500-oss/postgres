@@ -56,3 +56,6 @@ ALTER TABLE auth.users ADD  CONSTRAINT role_check CHECK (role IN ('sales_manager
 INSERT INTO auth.users (username, password, role) VALUES
 ('invent_man', crypt('impss', gen_salt('bf')), 'inventory_manager'),
 ('worker', crypt('wpss', gen_salt('bf')), 'worker');
+
+INSERT INTO auth.users (username, password, role) VALUES
+('new_invent_man', crypt('nimpss', gen_salt('bf')), 'inventory_manager');
