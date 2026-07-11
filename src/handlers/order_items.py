@@ -42,7 +42,7 @@ def _get_order_items_info(order_id: int) -> list[OrderItemInfo]:
                 WHEN di.status = 'planned' THEN 'запланирована отгрузка'
                 WHEN r.id IS NOT NULL AND r.quantity >= oi.quantity THEN 'в резерве'
                 WHEN ti.id IS NOT NULL THEN
-                    'в пути из ' || COALESCE(w.name, '?') ||
+                    'в пути из ' || COALESCE(c_wh.name || ', ' || w.address, '?') ||
                     CASE
                         WHEN t.arriving_at IS NOT NULL
                         THEN ', ожидается ' || to_char(t.arriving_at, 'DD.MM.YYYY HH24:MI')
@@ -62,6 +62,8 @@ def _get_order_items_info(order_id: int) -> list[OrderItemInfo]:
             ON t.id = ti.transfer_id
         LEFT JOIN catalog.warehouses w
             ON w.id = t.from_warehouse_id
+        LEFT JOIN catalog.cities c_wh
+            ON c_wh.id = w.city_id
         WHERE oi.order_id = %s
         ORDER BY oi.product_id;
     """
@@ -71,7 +73,7 @@ def _get_order_items_info(order_id: int) -> list[OrderItemInfo]:
         return cur.fetchall()
 
 
-def _create_order_item_info_table(_item : Item) -> Table:
+def _create_order_item_info_table() -> Table:
     table = Table(title="Позиции заказа", show_header=True, header_style="bold cyan")
 
     table.add_column("Продукт", style="dim", width=15, justify="right")
