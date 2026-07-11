@@ -33,7 +33,7 @@ def _get_warehouse_location(warehouse_id: int) -> str:
     with conn.cursor() as cur:
         cur.execute(query, (warehouse_id,))
         row = cur.fetchone()
-        return row if row else f"ID {warehouse_id}"
+        return row[0] if row else f"ID {warehouse_id}"
 
 
 def _get_central_warehouse() -> Warehouse:
