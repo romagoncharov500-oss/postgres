@@ -6,6 +6,7 @@ from typing import Optional
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
 from psycopg.rows import class_row
+from psycopg.errors import SerializationFailure
 from rich.table import Table
 from rich.panel import Panel
 
@@ -301,11 +302,11 @@ def delete_order(_id: str) -> None:
 def mark_order_processing(_id: str) -> None:
     order_id = int(_id)
 
+    # 1. Быстрая проверка снаружи транзакции (обычное чтение, без блокировки)
     order = _get_order(order_id)
     if order is None:
         return
 
-    # Проверяем, что статус 'new'
     if order.status != "new":
         render_error(
             f"Заказ ID: {order_id} имеет статус '{order.status}'. "
@@ -325,11 +326,35 @@ def mark_order_processing(_id: str) -> None:
         console.print("[yellow]Операция отменена.[/yellow]")
         return
 
-    # Обновляем статус и проставляем processed_by
+    # 2. Транзакция с REPEATABLE READ — защита от гонки
     conn = get_conn()
-    conn.execute(
-        "UPDATE sales.orders SET status = %s, processed_by = %s WHERE id = %s",
-        ("processing", auth_user().id, order_id)
-    )
+    try:
+        with conn.transaction():
+            conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
+
+            with conn.cursor(row_factory=class_row(Order)) as cur:
+                cur.execute(
+                    "SELECT * FROM sales.orders WHERE id = %s",
+                    (order_id,)
+                )
+                order = cur.fetchone()
+
+                # Повторная проверка — теперь под изоляцией
+                if order is None or order.status != "new":
+                    render_error("Заказ уже обработан другим менеджером.")
+                    return
+
+                cur.execute(
+                    "UPDATE sales.orders SET status = %s, processed_by = %s WHERE id = %s",
+                    ("processing", auth_user().id, order_id)
+                )
+            # COMMIT автоматически при выходе из with
+
+    except SerializationFailure:
+        render_error(
+            "Не удалось обработать заказ: другой менеджер опередил вас. "
+            "Попробуйте снова."
+        )
+        return
 
     console.print(f"[green] Заказ ID: {order_id} взят в обработку пользователем {auth_user().username}.[/green]")
