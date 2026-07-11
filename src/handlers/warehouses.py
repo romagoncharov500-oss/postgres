@@ -23,12 +23,17 @@ class Warehouse:
 
 
 def _get_warehouse_location(warehouse_id: int) -> str:
-    query = "SELECT (city, addres) FROM catalog.warehouses WHERE id = %s"
+    query = """
+    SELECT c.name || ', ' || w.address  
+    FROM catalog.warehouses w 
+    JOIN catalog.cities c ON c.id = w.city_id
+    WHERE w.id = %s; 
+    """
     conn = get_conn()
     with conn.cursor() as cur:
         cur.execute(query, (warehouse_id,))
         row = cur.fetchone()
-        return row[0] + ", " + row[1] if row else f"ID {warehouse_id}"
+        return row if row else f"ID {warehouse_id}"
 
 
 def _get_central_warehouse() -> Warehouse:
