@@ -13,6 +13,7 @@ CATEGORY_PRODUCT_CATEGORIES: Final[str] = "КАТЕГОРИИ ТОВАРОВ"
 CATEGORY_ORDERS: Final[str] = "ЗАКАЗЫ"
 CATEGORY_ITEMS: Final[str] = "ЗАКАЗАННЫЕ ТОВАРЫ"
 CATEGORY_ROUTES: Final[str] = "МАРШРУТЫ"
+CATEGORY_TRANSFERS: Final[str] = "ПЕРЕМЕЩЕНИЯ"
 
 CATEGORIES: Final[Sequence[str]] = [
     CATEGORY_PRODUCTS,
@@ -22,6 +23,7 @@ CATEGORIES: Final[Sequence[str]] = [
     CATEGORY_ITEMS,
     CATEGORY_ORDERS,
     CATEGORY_ROUTES,
+    CATEGORY_TRANSFERS,
 ]
 
 @dataclass(frozen=True)
