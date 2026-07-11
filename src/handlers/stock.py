@@ -29,7 +29,7 @@ class ProductStockRow:
 
 def _create_stock_table(title: str, first_column: str) -> Table:
     table = Table(title=title, show_header=True, header_style="bold cyan")
-    table.add_column(first_column, style="dim", width=20, justify="left")
+    table.add_column(first_column, style="dim", width=50, justify="left")
     table.add_column("Общее количество", style="green", min_width=15, justify="right")
     table.add_column("Доступно", style="yellow", min_width=10, justify="right")
     table.add_column("Резерв", style="magenta", min_width=10, justify="right")
@@ -93,18 +93,26 @@ def view_product_stock() -> None:
 
     query = """
         SELECT
-            w.name                AS warehouse_name,
-            s.quantity::int       AS total_quantity,
-            s.quantity::int       AS available_quantity,
-            0                     AS reserve_quantity
-        FROM inventory.stock s
-        JOIN catalog.warehouses w ON w.id = s.warehouse_id
-        WHERE s.product_id = %s
-        ORDER BY s.quantity DESC;
+            c.name || ', ' || w.address                         AS warehouse_name,
+            COALESCE(s.quantity, 0)::int                         AS total_quantity,
+            (COALESCE(s.quantity, 0)
+             - COALESCE(r_agg.reserve_qty, 0))::int              AS available_quantity,
+            COALESCE(r_agg.reserve_qty, 0)::int                  AS reserve_quantity
+        FROM catalog.warehouses w
+        JOIN catalog.cities c ON c.id = w.city_id
+        LEFT JOIN inventory.stock s ON s.warehouse_id = w.id AND s.product_id = %s
+        LEFT JOIN (
+            SELECT o.warehouse_id, SUM(r.quantity) AS reserve_qty
+            FROM inventory.reserves r
+            JOIN sales.orders o ON o.id = r.order_id
+            WHERE r.product_id = %s
+            GROUP BY o.warehouse_id
+        ) r_agg ON r_agg.warehouse_id = w.id
+        ORDER BY available_quantity DESC, warehouse_name;
     """
     conn = get_conn()
     with conn.cursor(row_factory=class_row(ProductStockRow)) as cur:
-        cur.execute(query, (int(product_id),))
+        cur.execute(query, (int(product_id), int(product_id)))
         rows = cur.fetchall()
 
     if not rows:
