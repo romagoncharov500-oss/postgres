@@ -5,3 +5,6 @@ ALTER TABLE sales.orders
 -- Добавляем внешний ключ на auth.users
 ALTER TABLE sales.orders 
     ADD CONSTRAINT processed_by_ref FOREIGN KEY (processed_by) REFERENCES auth.users (id);
+
+-- Даём inventory_manager права на обновление новой колонки
+GRANT UPDATE (processed_by) ON TABLE sales.orders TO inventory_manager;
