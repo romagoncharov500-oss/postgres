@@ -128,7 +128,7 @@ def add_warehouse() -> None:
             _update_central()
 
     conn.execute(
-            "INSERT INTO catalog.warehouses (city, address, label, is_central) VALUES (%s, %s, %s, %s)",
+            "INSERT INTO catalog.warehouses (city_id, address, label, is_central) VALUES (%s, %s, %s, %s)",
             (city_id, address, label, is_central),
     )
 
@@ -174,7 +174,7 @@ def edit_warehouse(_id: str) -> None:
         is_central = "TRUE"
 
     conn.execute(
-        """UPDATE catalog.warehouses SET city = %s, address = %s, label = %s, is_central = %s
+        """UPDATE catalog.warehouses SET city_id = %s, address = %s, label = %s, is_central = %s
         WHERE id = %s""",
         (city_id, address, label, is_central, _id),
     )
