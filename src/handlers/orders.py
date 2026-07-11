@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal
+from typing import Optional
 
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
@@ -42,6 +43,7 @@ class Order:
     created_at: datetime
     warehouse_id: int
     created_by: int
+    processed_by: Optional[int] = None
 
 
 def _get_order(_id: int) -> Order | None:
@@ -293,3 +295,41 @@ def delete_order(_id: str) -> None:
     # Благодаря ON DELETE CASCADE в миграции, order_items удалятся автоматически!
     conn.execute("DELETE FROM sales.orders WHERE id = %s", (_id,))
     console.print(f"[green] Заказ ID: {_id} и все его позиции успешно удалены.[/green]")
+
+
+@command("mark order processing", "взять заказ в обработку", CATEGORY_ORDERS, [ROLE_INVENTORY_MANAGER])
+def mark_order_processing(_id: str) -> None:
+    order_id = int(_id)
+
+    order = _get_order(order_id)
+    if order is None:
+        return
+
+    # Проверяем, что статус 'new'
+    if order.status != "new":
+        render_error(
+            f"Заказ ID: {order_id} имеет статус '{order.status}'. "
+            "В обработку можно взять только заказ со статусом 'new'."
+        )
+        return
+
+    # Показываем информацию о заказе
+    _render_order(order)
+
+    # Запрашиваем подтверждение
+    confirm = prompt(
+        f"Взять заказ ID: {order_id} в обработку? (y/n): ",
+        validator=YesNoValidator()
+    )
+    if YesNoValidator.is_no(confirm):
+        console.print("[yellow]Операция отменена.[/yellow]")
+        return
+
+    # Обновляем статус и проставляем processed_by
+    conn = get_conn()
+    conn.execute(
+        "UPDATE sales.orders SET status = %s, processed_by = %s WHERE id = %s",
+        ("processing", auth_user().id, order_id)
+    )
+
+    console.print(f"[green] Заказ ID: {order_id} взят в обработку пользователем {auth_user().username}.[/green]")
