@@ -45,11 +45,11 @@ def _create_stock_table(title: str, first_column: str) -> Table:
 def view_warehouse_stock() -> None:
     query = """
         SELECT
-            p.name                                                       AS product_name,
-            COALESCE(s_agg.total_quantity, 0)::int                       AS total_quantity,
-            (COALESCE(s_agg.total_quantity, 0)
-             - COALESCE(r_agg.reserve_quantity, 0))::int                 AS available_quantity,
-            COALESCE(r_agg.reserve_quantity, 0)::int                     AS reserve_quantity
+            p.name                                     AS product_name,
+            COALESCE(s_agg.total_quantity, 0) +
+            COALESCE(r_agg.reserve_quantity, 0)           AS total_quantity,
+            COALESCE(s_agg.total_quantity, 0)           AS available_quantity,
+            COALESCE(r_agg.reserve_quantity, 0)         AS reserve_quantity
         FROM catalog.products p
         LEFT JOIN (
             SELECT product_id, SUM(quantity) AS total_quantity
@@ -93,11 +93,11 @@ def view_product_stock() -> None:
 
     query = """
         SELECT
-            c.name || ', ' || w.address                         AS warehouse_name,
-            COALESCE(s.quantity, 0)::int                         AS total_quantity,
-            (COALESCE(s.quantity, 0)
-             - COALESCE(r_agg.reserve_qty, 0))::int              AS available_quantity,
-            COALESCE(r_agg.reserve_qty, 0)::int                  AS reserve_quantity
+            c.name || ', ' || w.address        AS warehouse_name,
+            COALESCE(s.quantity, 0)    +
+            COALESCE(r_agg.reserve_qty, 0)     AS total_quantity,
+            COALESCE(s.quantity, 0)            AS available_quantity,
+            COALESCE(r_agg.reserve_qty, 0)     AS reserve_quantity
         FROM catalog.warehouses w
         JOIN catalog.cities c ON c.id = w.city_id
         LEFT JOIN inventory.stock s ON s.warehouse_id = w.id AND s.product_id = %s
