@@ -22,6 +22,20 @@ class Warehouse:
     is_central: bool
 
 
+def _get_warehouse_location(warehouse_id: int) -> str:
+    query = """
+    SELECT c.name || ', ' || w.address  
+    FROM catalog.warehouses w 
+    JOIN catalog.cities c ON c.id = w.city_id
+    WHERE w.id = %s; 
+    """
+    conn = get_conn()
+    with conn.cursor() as cur:
+        cur.execute(query, (warehouse_id,))
+        row = cur.fetchone()
+        return row[0] if row else f"ID {warehouse_id}"
+
+
 def _get_central_warehouse() -> Warehouse:
     conn = get_conn()
     cur = conn.cursor(row_factory=class_row(Warehouse))
@@ -114,7 +128,7 @@ def add_warehouse() -> None:
             _update_central()
 
     conn.execute(
-            "INSERT INTO catalog.warehouses (city, address, label, is_central) VALUES (%s, %s, %s, %s)",
+            "INSERT INTO catalog.warehouses (city_id, address, label, is_central) VALUES (%s, %s, %s, %s)",
             (city_id, address, label, is_central),
     )
 
@@ -160,7 +174,7 @@ def edit_warehouse(_id: str) -> None:
         is_central = "TRUE"
 
     conn.execute(
-        """UPDATE catalog.warehouses SET city = %s, address = %s, label = %s, is_central = %s
+        """UPDATE catalog.warehouses SET city_id = %s, address = %s, label = %s, is_central = %s
         WHERE id = %s""",
         (city_id, address, label, is_central, _id),
     )

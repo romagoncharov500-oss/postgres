@@ -77,8 +77,14 @@ def _build_completer_dict() -> dict:
         for word in words[:-1]:
             if word not in current:
                 current[word] = {}
+            elif current[word] is None:
+                # Если уже None, но нужно добавить вложенную команду — создаём словарь
+                current[word] = {}
             current = current[word]
-        current[words[-1]] = None
+        
+        # Не перезаписываем словарь на None, если там уже есть вложенные команды
+        if words[-1] not in current or current[words[-1]] is None:
+            current[words[-1]] = None
     return result
 
 

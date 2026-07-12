@@ -5,6 +5,7 @@ from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit import prompt
 from prompt_toolkit.shortcuts import choice
 from psycopg.rows import class_row, scalar_row
+from rich.table import Table
 
 from console import console, render_error
 from db import get_conn
@@ -20,6 +21,67 @@ class Item:
     product_id: int
     quantity: int
     price: Decimal
+
+
+@dataclass
+class OrderItemInfo:
+    product_name: str
+    price: Decimal
+    quantity: int
+    item_status: str
+
+
+def _get_order_items_info(order_id: int) -> list[OrderItemInfo]:
+    query = """
+        SELECT
+            p.name AS product_name,
+            oi.price,
+            oi.quantity,
+            CASE
+                WHEN di.status = 'shipped' THEN 'отгружено'
+                WHEN di.status = 'planned' THEN 'запланирована отгрузка'
+                WHEN r.id IS NOT NULL AND r.quantity >= oi.quantity THEN 'в резерве'
+                WHEN ti.id IS NOT NULL THEN
+                    'в пути из ' || COALESCE(c_wh.name || ', ' || w.address, '?') ||
+                    CASE
+                        WHEN t.arriving_at IS NOT NULL
+                        THEN ', ожидается ' || to_char(t.arriving_at, 'DD.MM.YYYY HH24:MI')
+                        ELSE ''
+                    END
+                ELSE 'ожидает обработки'
+            END AS item_status
+        FROM sales.order_items oi
+        JOIN catalog.products p ON p.id = oi.product_id
+        LEFT JOIN inventory.reserves r
+            ON r.order_id = oi.order_id AND r.product_id = oi.product_id
+        LEFT JOIN inventory.delivery_items di
+            ON di.order_id = oi.order_id AND di.product_id = oi.product_id
+        LEFT JOIN inventory.transfer_items ti
+            ON ti.reserve_id = r.id
+        LEFT JOIN inventory.transfers t
+            ON t.id = ti.transfer_id
+        LEFT JOIN catalog.warehouses w
+            ON w.id = t.from_warehouse_id
+        LEFT JOIN catalog.cities c_wh
+            ON c_wh.id = w.city_id
+        WHERE oi.order_id = %s
+        ORDER BY oi.product_id;
+    """
+    conn = get_conn()
+    with conn.cursor(row_factory=class_row(OrderItemInfo)) as cur:
+        cur.execute(query, (order_id,))
+        return cur.fetchall()
+
+
+def _create_order_item_info_table() -> Table:
+    table = Table(title="Позиции заказа", show_header=True, header_style="bold cyan")
+
+    table.add_column("Продукт", style="dim", width=15, justify="right")
+    table.add_column("Цена", style="green", min_width=20)
+    table.add_column("Количество", style="yellow", min_width=10)
+    table.add_column("Статус", style="magenta", min_width=20)
+
+    return table
 
 
 def _get_availible_products(_order_id: int) -> list[Product]:
